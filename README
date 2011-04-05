@@ -1,3 +1,9 @@
 GoMedia, an HTML5 and Go-based media player
 
+1.) Install GO
+2.) make
+3.) ./gomedia -root="/Users/<username>/Music/iTunes/iTunes Media/" -http=":4020"
+4.) open "http://localhost:4020"
+5.) enjoy
+
 -- Josh Holt

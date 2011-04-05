@@ -18,7 +18,7 @@ const (
 
 var (
 	addr = flag.String("http", ":8080", "http listen address")
-	root = flag.String("root", "/Users/joshholt/Music/iTunes/", "music root")
+	root = flag.String("root", "/User/<username>/Music/iTunes/", "music root")
 )
 
 func main() {

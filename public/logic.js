@@ -47,10 +47,10 @@ function clickDir(e) {
 	load(path);
 }
 function clickFile(e) {
-	addToPlaylist($(e.target).data('file'), $(e.target).data('evenOrOdd'));
+  var className = $('#playlist > a:last').hasClass('even') ? 'odd' : 'even';
+	addToPlaylist($(e.target).data('file'), className);
 }
 function addToPlaylist(f, eoo) {
-  console.log(eoo);
 	var $p = $('#playlist');
 	var playnow = ($p.find('a').length === 0);
 	var $d = $('<a></a>').text(f.Name).data('file', f).data('path', path.map(function(i) { return i; })).addClass(eoo)
@@ -59,8 +59,12 @@ function addToPlaylist(f, eoo) {
 	if (playnow) $d.click();
 }
 function addAll() {
+  var hasEven, cls;
+  hasEven = $('#playlist > a:last').hasClass('even');
+  
 	$('#browser a.file').each(function(i, e) {
-		addToPlaylist($(e).data('file'), (i % 2) === 0 ? 'even' : 'odd');
+	  cls = hasEven ? (i % 2 === 0) ? 'odd' : 'even' : (i % 2 === 0) ? 'even' : 'odd';
+		addToPlaylist($(e).data('file'), cls);
 	});
 }
 function play(el) {
