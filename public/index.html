@@ -5,19 +5,22 @@
 	<title>Media on the GO!</title>
 	<link rel="stylesheet" href="public/style.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="public/logic.js" type="text/javascript" charset="utf-8"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			init();
-		});
-	</script>
 </head>
 <body>
 	<div id="header">
-		<audio id="player" controls autoplay>
-			<source>
-				<p>What? Your browser doesn't support &lt;audio&gt;?! Lame.</p>
-		</audio>
+		<p class="player">
+		  <span id="playtoggle"></span>
+		  <span id="gutter">
+		    <span id="loading"></span>
+		    <span id="handle" class="ui-slider-handle"></span>
+		  </span>
+		  <span id="timeleft"></span>
+		  <audio id="player" autoplay>
+		    <source>
+		  </audio>
+		</p>
 	</div>
 	<div id="browser"></div>
 	<div id="playlist"></div>
