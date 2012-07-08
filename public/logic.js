@@ -17,18 +17,18 @@ function load(path)  {
 function populate(files) {
 	var $b = $('#browser').empty();
 	function add(i, f) {
-		if (f.Name[0] == '.') return;
-		var dir = (f.Mode & 040000);
+		if (f.name[0] == '.') return;
+		var dir = f.isDir;
 		var cl = dir ? "dir" : "file";
 		var evenOrOdd = (i %2 === 0) ? 'even' : 'odd';
-		
-		$('<a></a>').text(f.Name).data('file', f).data('evenOrOdd', evenOrOdd)
+
+		$('<a></a>').text(f.name).data('file', f).data('evenOrOdd', evenOrOdd)
 			.addClass(cl).appendTo($b)
 			.click(dir?clickDir:clickFile);
 	}
 	files.sort(function(a, b) {
-		a = a.Name.toLowerCase();
-		b = b.Name.toLowerCase();
+		a = a.name.toLowerCase();
+		b = b.name.toLowerCase();
 		if (a > b) return 1;
 		if (a < b) return -1;
 		return 0;
@@ -43,7 +43,7 @@ function up() {
 	});
 }
 function clickDir(e) {
-	path.push($(e.target).data('file').Name);
+	path.push($(e.target).data('file').name);
 	load(path);
 }
 function clickFile(e) {
@@ -53,7 +53,7 @@ function clickFile(e) {
 function addToPlaylist(f, eoo) {
 	var $p = $('#playlist');
 	var playnow = ($p.find('a').length === 0);
-	var $d = $('<a></a>').text(f.Name).data('file', f).data('path', path.map(function(i) { return i; })).addClass(eoo)
+	var $d = $('<a></a>').text(f.name).data('file', f).data('path', path.map(function(i) { return i; })).addClass(eoo)
 		.appendTo($p)
 		.click(function(e) { play(e.target); });
 	if (playnow) $d.click();
@@ -61,14 +61,14 @@ function addToPlaylist(f, eoo) {
 function addAll() {
   var hasEven, cls;
   hasEven = $('#playlist > a:last').hasClass('even');
-  
+
 	$('#browser a.file').each(function(i, e) {
 	  cls = hasEven ? (i % 2 === 0) ? 'odd' : 'even' : (i % 2 === 0) ? 'even' : 'odd';
 		addToPlaylist($(e).data('file'), cls);
 	});
 }
 function play(el) {
-	var name = $(el).data('file').Name;
+	var name = $(el).data('file').name;
 	var pth = $(el).data('path');
 	var url = root+pth.join('/')+'/'+name;
 	$('#playlist a').removeClass('playing');
@@ -90,7 +90,7 @@ $(document).ready(function() {
 	    timeleft,
 	    loaded = false,
 	    manualSeek = false;
-	
+
 	audio = $('.player audio').get(0);
 	loadingIndicator = $('.player #loading');
 	positionIndicator = $('.player #handle');
@@ -105,7 +105,7 @@ $(document).ready(function() {
 	else {
 	  loadingIndicator.remove();
 	}
-	
+
 	$(audio).bind('timeupdate', function() {
 
 	  var rem = parseInt(audio.duration - audio.currentTime, 10),
@@ -124,28 +124,28 @@ $(document).ready(function() {
 	      orientation: "horizontal",
 	      range: "min",
 	      max: audio.duration,
-	      animate: true,          
-	      slide: function() {             
+	      animate: true,
+	      slide: function() {
 	        manualSeek = true;
 	      },
 	      stop:function(e,ui) {
-	        manualSeek = false;         
+	        manualSeek = false;
 	        audio.currentTime = ui.value;
 	      }
 	    });
 	  }
 
 	});
-	
-	$(audio).bind('play',function() {
-	  $("#playtoggle").addClass('playing');   
-	}).bind('pause', function() {
-	  $("#playtoggle").removeClass('playing');    
-	});   
 
-	$("#playtoggle").click(function() {     
-	  if (audio.paused) { audio.play(); } 
-	  else { audio.pause(); }     
+	$(audio).bind('play',function() {
+	  $("#playtoggle").addClass('playing');
+	}).bind('pause', function() {
+	  $("#playtoggle").removeClass('playing');
 	});
-	
+
+	$("#playtoggle").click(function() {
+	  if (audio.paused) { audio.play(); }
+	  else { audio.pause(); }
+	});
+
 });

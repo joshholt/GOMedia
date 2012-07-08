@@ -1,12 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"http"
 	"io"
-	"json"
-	"os"
 	"mime"
+	"net/http"
+	"os"
+	"time"
 	"path"
 	"strconv"
 	"strings"
@@ -15,6 +16,14 @@ import (
 const (
 	filePrefix = "/f/"
 )
+
+type LibraryItem struct {
+	Name string `json:"name"`
+	Size int64 `json:"size"`
+	Mode os.FileMode `json:"mode"`
+	ModTime time.Time `json:"modTime"`
+	IsDir bool `json:"isDir"`
+}
 
 var (
 	addr = flag.String("http", ":8080", "http listen address")
@@ -30,55 +39,75 @@ func main() {
 }
 
 func StaticHandler(w http.ResponseWriter, r *http.Request) {
-  if r.URL.Path == "/" {
-    http.ServeFile(w, r, "public/index.html")
-  } else {
-    http.ServeFile(w, r, strings.Replace(r.URL.Path, "/", "", 1)) 
-  }
+	if r.URL.Path == "/" {
+		http.ServeFile(w, r, "public/index.html")
+	} else {
+		http.ServeFile(w, r, strings.Replace(r.URL.Path, "/", "", 1))
+	}
 }
 
 func File(w http.ResponseWriter, r *http.Request) {
 	fn := *root + r.URL.Path[len(filePrefix):]
 	fi, err := os.Stat(fn)
 	if err != nil {
-		http.Error(w, err.String(), http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	if fi.IsDirectory() {
+	if fi.IsDir() {
 		serveDirectory(fn, w, r)
 		return
 	}
-	f, err := os.Open(fn, os.O_RDONLY, 0)
+	f, err := os.Open(fn)
 	if err != nil {
-		http.Error(w, err.String(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	t := mime.TypeByExtension(path.Ext(fn))
 	if t == "" {
 		t = "application/octet-stream"
 	}
-	w.SetHeader("Content-Type", t)
-	w.SetHeader("Content-Length", strconv.Itoa64(fi.Size))
+	w.Header().Set("Content-Type", t)
+	w.Header().Set("Content-Length", strconv.FormatInt(fi.Size(), 10))
 	io.Copy(w, f)
+}
+
+func handleNonHTTPError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func findFiles(fn string) []os.FileInfo {
+	dir, err := os.Open(fn)
+	handleNonHTTPError(err)
+	items, err := dir.Readdir(-1)
+	handleNonHTTPError(err)
+	return items
+}
+
+func buildLibrary(items []os.FileInfo) []LibraryItem {
+	var library = []LibraryItem{}
+
+	for i := 0; i < len(items); i++ {
+		f := items[i]
+		library = append(library, LibraryItem{f.Name(), f.Size(), f.Mode(), f.ModTime(), f.IsDir()})
+	}
+
+	return library
 }
 
 func serveDirectory(fn string, w http.ResponseWriter, r *http.Request) {
 	defer func() {
-		if err, ok := recover().(os.Error); ok {
-			http.Error(w, err.String(), http.StatusInternalServerError)
+		if err, ok := recover().(error); ok {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}()
-	d, err := os.Open(fn, os.O_RDONLY, 0)
-	if err != nil {
-		panic(err)
-	}
-	files, err := d.Readdir(-1)
-	if err != nil {
-		panic(err)
-	}
+
+	var library = buildLibrary(findFiles(fn))
+
 	j := json.NewEncoder(w)
-	w.SetHeader("Content-Type", "application/json")
-	if err := j.Encode(files); err != nil {
+	w.Header().Set("Content-Type", "application/json")
+	if err := j.Encode(library); err != nil {
 		panic(err)
 	}
 }
