@@ -22,9 +22,22 @@ function populate(files) {
 		var cl = dir ? "dir" : "file";
 		var evenOrOdd = (i %2 === 0) ? 'even' : 'odd';
 
-		$('<a></a>').text(f.name).data('file', f).data('evenOrOdd', evenOrOdd)
+		var theLink = $('<a></a>')
+
+		$(theLink).text(f.name).data('file', f).data('evenOrOdd', evenOrOdd)
 			.addClass(cl).appendTo($b)
-			.click(dir?clickDir:clickFile);
+			.click(dir?clickDir:clickFile)
+			.hover(
+				function() {
+					$(this.children[0]).addClass('icon-white');
+				},
+				function() {
+					$(this.children[0]).removeClass('icon-white');
+				}
+			);
+
+		if (dir) $('&nbsp;<i class="icon-folder-close"></i>').prependTo($(theLink));
+		else $('&nbsp;<i class="icon-music"></i>').prependTo($(theLink));
 	}
 	files.sort(function(a, b) {
 		a = a.name.toLowerCase();
@@ -55,7 +68,16 @@ function addToPlaylist(f, eoo) {
 	var playnow = ($p.find('a').length === 0);
 	var $d = $('<a></a>').text(f.name).data('file', f).data('path', path.map(function(i) { return i; })).addClass(eoo)
 		.appendTo($p)
-		.click(function(e) { play(e.target); });
+		.click(function(e) { play(e.target); })
+		.hover(
+			function() {
+				$(this.children[0]).addClass('icon-white');
+			},
+			function() {
+				$(this.children[0]).removeClass('icon-white');
+			}
+		);
+	$('&nbsp;<i class="icon-music"></i>').prependTo($($d));
 	if (playnow) $d.click();
 }
 function addAll() {
@@ -73,12 +95,17 @@ function play(el) {
 	var url = root+pth.join('/')+'/'+name;
 	$('#playlist a').removeClass('playing');
 	$(el).addClass('playing');
+	$('#playlist a.playing > i').addClass('icon-white');
 	$('#player').attr('src', url);
 }
 function next() {
 	var $next = $('#playlist a.playing').next();
 	if ($next.length) {
-		setTimeout($next.click(), 2000);
+		var nextFunc = function() {
+			$('i').removeClass('icon-white');
+			$next.click();
+		};
+		setTimeout(nextFunc, 2000);
 	}
 }
 
