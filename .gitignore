@@ -1,5 +1,4 @@
 *.6
-GOMedia
 bin
 pkg
 .DS_Store
