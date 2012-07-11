@@ -1,10 +1,10 @@
 ###GoMedia, an HTML5 and Go-based media player (Updated to work with Go Version 1.x)
 
-1.) Install [GO][golang]
-2.) `make`
-3.) `./bin/gomedia -user="<username>"`
-4.) `open "http://localhost:8080"`
-5.) enjoy
+1.  Install [GO][golang]
+2.  `make`
+3.  `./bin/gomedia -user="<username>"`
+4.  `open "http://localhost:8080"`
+5.  enjoy
 
 ###More Info
 
