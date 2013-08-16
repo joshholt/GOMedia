@@ -5,9 +5,9 @@ package main
 
 import (
 	"flag"
+	"github.com/joshholt/types"
+	"github.com/joshholt/web"
 	"net/http"
-	"com.mrd/web"
-	"com.mrd/types"
 )
 
 // filePrefix defines the path the SPA frontend uses to browse directories and
