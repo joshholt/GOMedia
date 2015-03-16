@@ -1,6 +1,6 @@
 all:
-	go get github.com/joshholt/web
-	go get github.com/joshholt/types
+	GOPATH=`pwd` go get github.com/joshholt/web
+	GOPATH=`pwd` go get github.com/joshholt/types
 	GOPATH=`pwd` go install gomedia
 
 clean:
